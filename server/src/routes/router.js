@@ -5,14 +5,14 @@ const UserSchema = require("../model/UserSchema.js")
 const AddToCartSchema = require("../model/AddToCartSchema.js")
 const TASchema = require("../model/TASchema.js")
 const Razorpay = require('razorpay')
-const PaymentSchema = require('../model/PaymentSchema.js')
+const PaymentSchema = require('../model/PaymentSchema.js');
 //get products from db
 router.get("/get-products", async (req, res) => {
     try {
-        const data = await ProductSchema.find({});
-        res.status(200).json(data)
+        const products = await ProductSchema.find({});
+        res.json(products)
     } catch (error) {
-        console.log("Error in gettng data from db", error);
+        console.log("error in getProducts", error)
     }
 })
 
@@ -23,13 +23,14 @@ router.get("/product/:id", async (req, res) => {
         res.status(200).json(data);
     } catch (error) {
         console.log("Error in gettng data from db acc to id", error);
+        res.json(error)
     }
 })
 
 //signup api
 // router.post("/signup", async (req, res) => {
 //     try {
-//         const user = new UserSchema(req.body)
+//         const user = new UserSchema(req.body)http://localhost:5000/payment-history/ziL3U5yrIJaLmt9j1CSEH4MHlWH2
 //         await user.save();
 //         res.status(200).json("Signup success");
 //     } catch (error) {
@@ -53,58 +54,56 @@ router.get("/product/:id", async (req, res) => {
 //signup / login api
 router.post('/signup', async (req, res) =>{
     try {
-        const data = await UserSchema.findOne({email: req.body.email});
-        if(data==undefined){
-            const User = new UserSchema(req.body)
-            await User.save();
-            const TA = new TASchema({
-                googleId: req.body.googleId,
-                price: 0,
+        const data = await UserSchema.findOne({uid: req.body.uid});
+        if(!data){
+            const User = new UserSchema({
+                email: req.body.email,
+                uid: req.body.uid,
             })
-            await TA.save();
+            await User.save();
             console.log("data saved successfully")
-        }
-        res.send("login/signup success")
+            res.send("login/signup success")
+        }else res.send("user already exists")
     } catch (error) {
         console.log("Error in signup", error);
     }
 })
 
 //add to cart
-router.post('/add-to-cart', async (req, res) => {
+router.post('/add-to-cart/:uid', async (req, res) => {
     try {
-        const User = await AddToCartSchema.findOne({googleId: req.body.googleId, id: req.body.id});
+        const User = await AddToCartSchema.findOne({uid: req.params.uid, id: req.body.id});
         if(!User){
-       const data = new AddToCartSchema(req.body);
+       const data = new AddToCartSchema({
+           uid: req.params.uid,
+           id: req.body.id,
+           url: req.body.url,
+           detailUrl: req.body.detailUrl,
+           title: req.body.title,
+           price: req.body.price,
+           description: req.body.description,
+           tagline: req.body.tagline,
+       });
        await data.save();
-       res.status(200).send("Added to cart successfully"); 
-    }else res.status(200).send("Already Added to cart");
+       res.status(200).json("Added to cart successfully"); 
+    }else res.status(100).json("Already Added to cart");
     } catch (error) {
         console.log("error in addToCart", error);
     }
 })
 
 //get Data from Cart
-router.get('/get-cart-items/:gId',async (req, res) => {
+router.get('/get-cart-items/:uid',async (req, res) => {
     try {
-        const data = await AddToCartSchema.find({googleId: req.params.gId});
-        res.status(200).send(data);
+        const data = await AddToCartSchema.find({uid: req.params.uid});
+        res.status(200).json(data);
     } catch (error) {
         console.log("error in getCartItems", error);
     }
 })
 
-//update totalprice
-
-
-
-
-
-
-
-
 //razorpay
-router.post('/orders/:gId', async (req, res) => {
+router.post('/orders/:uid', async (req, res) => {
     var instance = new Razorpay({ key_id: 'rzp_test_NrNMTNSXspRsSj', key_secret: 'WM5lWrQOEzrcrdNdL2swrm6K' })
     var options = {
         amount: Number(req.body.price.cost)*100,
@@ -118,7 +117,7 @@ router.post('/orders/:gId', async (req, res) => {
         res.status(200).json(order);
         const currentDateAndTime = new Date();
         const paymentData = new PaymentSchema({
-            googleId: req.params.gId,
+            uid: req.params.uid,
             productId: req.body.id,   
             url: req.body.url,
             title: req.body.title,
@@ -134,14 +133,29 @@ router.post('/orders/:gId', async (req, res) => {
 })
 
 //get payment history
-router.get('/payment-history/:gId',async (req, res) => {
+router.get('/payment-history/:uid',async (req, res) => {
     try {
-        const data = await PaymentSchema.find({googleId: req.params.gId});
-        res.status(200).json(data);
+        const data = await PaymentSchema.find({uid: req.params.uid})
+        res.status(200).json(data)
     } catch (error) {
-        console.log("Error getting payment history", error);
+        console.log("Payment history error: ",error)
     }
 })
 
+//delete account
+router.post('/delete-account', async (req, res) => {
+    try {
+        const data = await UserSchema.find({uid: req.body.uid})
+        if(!data){
+            return res.status(404).json("User not found")
+        }else{
+        await UserSchema.deleteOne({uid: req.body.uid})
+        await AddToCartSchema.deleteMany({uid: req.body.uid})
+        await PaymentSchema.deleteMany({uid: req.body.uid})
+        res.status(200).json("Delete Account Success")}
+    } catch (error) {
+        console.log("Delete account error: ",error)
+    }
+})
 
 module.exports = router;

@@ -12,9 +12,6 @@ const Slide = () => {
     return (
         <div>
             <DealsOfDay products={products} />
-            <DealsOfDay products={products} />
-            <DealsOfDay products={products} />
-            <DealsOfDay products={products} />
         </div>
     )
 }

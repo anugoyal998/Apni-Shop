@@ -66,7 +66,7 @@ const Cart = ({ match }) => {
               <div className="col-lg-4 col-md-4 col-sm-12 col-12 mx-auto mt-3 pt-2" style={style.priceSection}>
                 <Typography style={style.right.priceDetail}>PRICE DETAILS</Typography>
                 <hr />
-                <Typography style={style.right.totalAmount}>Total Amount {ta} </Typography>
+                <Typography style={style.right.totalAmount}>Total Amount</Typography>
               </div>
             </div>
           ) : (
@@ -118,7 +118,7 @@ export const MyCard = ({ e, key }) => {
             <Typography style={style.right.shortTitle}>{e.title.shortTitle}</Typography>
             <Typography style={style.right.cost}>₹ {e.price.cost}</Typography>
             <Typography style={style.right.discount}>{e.discount}</Typography>
-            <ButtonGroup style={style.button}><Button style={style.button}>Buy Now</Button></ButtonGroup>
+            {/* <ButtonGroup style={style.button}><Button style={style.button}>Buy Now</Button></ButtonGroup> */}
           </div>
         </div>
       </CardActionArea>

@@ -21,11 +21,7 @@ const SlideTest = ()=> {
     },[])
     return(
         <>
-        <ProductInfoTestProvider><MyCarouselTest getProductsTest={getProductsTest}  /></ProductInfoTestProvider>
-        <ProductInfoTestProvider><MyCarouselTest getProductsTest={getProductsTest}  /></ProductInfoTestProvider>
-        <ProductInfoTestProvider><MyCarouselTest getProductsTest={getProductsTest}  /></ProductInfoTestProvider>
-        <ProductInfoTestProvider><MyCarouselTest getProductsTest={getProductsTest}  /></ProductInfoTestProvider>
-        </>
+        <ProductInfoTestProvider><MyCarouselTest getProductsTest={getProductsTest}  /></ProductInfoTestProvider>        </>
     )
 }
 

@@ -4,12 +4,11 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import {getProductsReducer} from './reducer/getProductsReducer.js'
 import {getProductInfoReducer} from './reducer/getProductInfoReducer.js'
 import {PaymentsHistoryReducer} from './reducer/PaymentsHistoryReducer'
-import {GetAccountReducer} from './reducer/GetAccountReducer.js'
+import {getCurrUserReducer} from './reducer/currUserReducer.js'
 const reducer = combineReducers({
     getProducts: getProductsReducer,
     getProductInfo: getProductInfoReducer,
     getPaymentsHistory: PaymentsHistoryReducer,
-    getAccount: GetAccountReducer,
 })
 
 const middleware = [thunk]
