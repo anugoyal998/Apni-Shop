@@ -32,9 +32,9 @@ const App = () => {
       <AccountProvider>
         <Navbar />
       </AccountProvider>
-      <AccountProvider>
-        <Route path="/profile/:name" exact component={Profile}></Route>
-      </AccountProvider>
+      {/* <AccountProvider> */}
+        {/* <Route path="/profile/:name" exact component={Profile}></Route> */}
+      {/* </AccountProvider> */}
       <Route path="/" exact>
         <Home />
         <GetProductsTestProvider>

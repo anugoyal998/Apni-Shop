@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const PaymentSchema = new mongoose.Schema({
-    googleId: String,
+    uid: String,
     productId: String,
     url: String,
     title: {

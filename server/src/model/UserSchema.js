@@ -5,11 +5,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         unique: true,
     },
-    familyName: String,
-    givenName: String,
-    googleId: String,
-    imageUrl: String,
-    name: String
+    uid: {
+        type: String,
+        unique: true,
+    }
 })
 
 const UserModal = new mongoose.model('user', UserSchema);

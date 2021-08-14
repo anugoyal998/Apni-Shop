@@ -5,6 +5,7 @@ import { ProductInfoTestContext } from "../../context/ProductInfoTestProvider.js
 import { CurrentUserContext } from "../../context/CurrentUserProvider.jsx";
 import {TAContext} from "../../context/TAProvider.jsx";
 import axios from "axios";
+import {auth} from '../../firebase/firebase.js'
 const useStyles = makeStyles((theme) => ({
   icon: {
     color: "#000",
@@ -26,7 +27,6 @@ const ProductInfo = ({ match }) => {
   const [productInfoTest, setProductInfoTest] = useContext(
     ProductInfoTestContext
     );
-  const [ta,setTA] = useContext(TAContext);
   const handleApiCall = async (req, res) => {
     try {
       const url = "http://localhost:5000";
@@ -85,55 +85,39 @@ const ProductInfo = ({ match }) => {
       marginTop: "1rem",
     },
   };
-  const [account, setAccount] = useContext(CurrentUserContext);
-  const [addToCart, setAddToCart] = useState({
-    googleId: "",
-    id: "",
-    url: "",
-    detailUrl: "",
-    title: {
-      shortTitle: "",
-      longTitle: "",
-    },
-    price: {
-      mrp: "",
-      cost: "",
-      discount: "",
-    },
-    description: "",
-    discount: "",
-    tagline: "",
-    cnt: 1,
-  });
-  const handleAddToCart = async () => {
-    setTimeout(() => {
-      setAddToCart({
-        ...addToCart,
-        googleId: account.googleId,
-        id: productInfoTest.id,
-        url: productInfoTest.url,
-        detailUrl: productInfoTest.detailUrl,
-        title: productInfoTest.title,
-        price: productInfoTest.price,
-        description: productInfoTest.description,
-        discount: productInfoTest.discount,
-        tagline: productInfoTest.tagline,
-      });
-      setTA(ta + Number(productInfoTest.price.cost));
-    }, 1000);
-  };
-  useEffect(async (req,res) => {
-    if (addToCart.googleId === "") return;
-    try {
-      const url = "http://localhost:5000";
-      await axios.post(`${url}/add-to-cart`, addToCart);
-      console.log("added to cart successfully");
-    } catch (error) {
-      console.log("error in add to cart frontend", error);
-    }
-  }, [addToCart]);
+  const [currUser,setCurrUser] = useState();
+  useEffect(()=> {
+    const user = auth.currentUser;
+    if(user)setCurrUser(user);
+  },[]);
+  console.log(currUser);
+
+  //add to cart
+  const [addToCart,setAddToCart] = useState()
+  const handleAddToCart = async ()=> {
+    setAddToCart({
+      // ..addToCart,
+      uid: currUser.uid,
+      id: productInfoTest.id,
+      url: productInfoTest.url,
+      detailUrl: productInfoTest.detailUrl,
+      title: {
+        shortTitle: productInfoTest.title.shortTitle,
+        longTitle: productInfoTest.title.longTitle,
+      },
+      price: productInfoTest.price,
+      description: productInfoTest.description,
+      tagline: productInfoTest.tagline,
+      cnt: 1,
+    })
+  }
+  console.log(addToCart)
+
+
+
+
+
   const classes = useStyles();
-  console.log(ta)
 
 
 
@@ -144,7 +128,7 @@ const ProductInfo = ({ match }) => {
   const [signature,setSignature] = useState();
   const buynow = async ()=> {
     const url = 'http://localhost:5000'
-    const response = await axios.post(`${url}/orders/${account.googleId}`, productInfoTest)
+    const response = await axios.post(`${url}/orders/${currUser.uid}}`, productInfoTest)
     if(response.status!==200)return;
     const options = {
       "key": "rzp_test_NrNMTNSXspRsSj",
@@ -165,8 +149,8 @@ const ProductInfo = ({ match }) => {
           alert("Payment Done Successfully");
       },
       "prefill": {
-          "name": account.name,
-          "email": account.email,
+          "name": currUser.displayName,
+          "email": currUser.email,
           "contact": ""
       },
       "notes": {
