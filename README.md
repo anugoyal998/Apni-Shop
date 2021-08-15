@@ -1,2 +1,3 @@
 # Apni-Shop
-Readme will be updated later, when website will be complete.
+The project is under developemnt mode. All the things will be updated later.
+Website Link: https://apnishop1.herokuapp.com/profile
